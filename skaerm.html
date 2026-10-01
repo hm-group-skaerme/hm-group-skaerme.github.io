@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>HM Group skærm</title>
+<style>html,body{margin:0;height:100%;background:#0B1220;color:#8EA3C2;font:28px sans-serif;overflow:hidden}
+#msg{height:100%;display:flex;align-items:center;justify-content:center}</style>
+</head><body><div id="msg">Henter data…</div>
+<script>
+// Brug: ?screen=meta&k=NØGLE eller ?screen=google&k=NØGLE
+// Uden gyldig nøgle viser siden ingenting.
+(function () {
+  var msg = document.getElementById('msg');
+  var p = location.search;
+  var screen = /screen=google/.test(p) ? 'google' : 'meta';
+  var m = p.match(/[?&]k=([^&]+)/);
+  if (!m) { msg.textContent = 'Ingen adgang'; return; }
+  var SRC = 'https://thomas-jensen19.app.n8n.cloud/webhook/hm-skaerme?screen=' + screen + '&key=' + m[1];
+  function retry() { setTimeout(function () { location.reload(); }, 60 * 1000); }
+  try {
+    var x = new XMLHttpRequest();
+    x.open('GET', SRC + '&_=' + Date.now(), true);
+    x.timeout = 60000;
+    x.onload = function () {
+      var h = x.responseText || '';
+      if (x.status === 200 && h.indexOf('PERFORMANCE') > -1) {
+        document.open(); document.write(h); document.close();
+        setTimeout(function () { location.reload(); }, 30 * 60 * 1000);
+      } else if (x.status === 403) { msg.textContent = 'Ingen adgang'; }
+      else { retry(); }
+    };
+    x.onerror = retry; x.ontimeout = retry;
+    x.send();
+  } catch (e) { retry(); }
+})();
+</script></body></html>
