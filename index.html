@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HM Group skærm</title>
+<style>html,body{margin:0;height:100%;background:#0B1220;color:#8EA3C2;font:28px sans-serif;overflow:hidden}
+#msg{height:100%;display:flex;align-items:center;justify-content:center}</style>
+</head><body><div id="msg">Henter data…</div>
+<script>
+// Brug: ?screen=meta eller ?screen=google
+// Henter dashboardet fra n8n og skriver det direkte ind i siden (ingen ekstra iframes).
+(function () {
+  var screen = /screen=google/.test(location.search) ? 'google' : 'meta';
+  var SRC = 'https://thomas-jensen19.app.n8n.cloud/webhook/hm-skaerme?screen=' + screen;
+  function retry() { setTimeout(function () { location.reload(); }, 60 * 1000); }
+  try {
+    var x = new XMLHttpRequest();
+    x.open('GET', SRC + '&_=' + Date.now(), true);
+    x.timeout = 60000;
+    x.onload = function () {
+      var h = x.responseText || '';
+      if (x.status === 200 && h.indexOf('PERFORMANCE') > -1) {
+        document.open(); document.write(h); document.close();
+        setTimeout(function () { location.reload(); }, 30 * 60 * 1000);
+      } else { retry(); }
+    };
+    x.onerror = retry; x.ontimeout = retry;
+    x.send();
+  } catch (e) { retry(); }
+})();
+</script></body></html>
